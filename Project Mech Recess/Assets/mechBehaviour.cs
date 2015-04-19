@@ -3,17 +3,21 @@ using System.Collections;
 
 public class mechBehaviour : MonoBehaviour {
 
-    //Public Variables
+    //BASE STAT VARIABLES (Edit these in the inspector)
 	public float acceleration = 5f;
     public float topSpeed = 10f;
     public float jumpPower = 10f;
     public float boostPower = 10f;
-    public float boostAllowed = 0f;
-    public float reticleMaxDistance;
+    public float boostCooldown = 1f;
+    public int boostNumber = 2;
+    public float reticleMaxDistance = 100f;
 
-    //Private Variables
+    //Private Stat Variables
     private bool onGround = false;
     private float landRecovery = 0.2f;
+    private float boostCooldown_Var = 0f;
+    private int boostNumber_Var = 0;
+    private float transparency = 1;
 
     //Input Variables
 	private float hAxesInput;
@@ -24,7 +28,7 @@ public class mechBehaviour : MonoBehaviour {
     //Public Components
     public GameObject mainCamera;
     public GameObject reticleObj;
-    public GameObject dangerLight;
+    public GameObject boostLight;
 
     //Private Components
 	private Rigidbody RB;
@@ -60,8 +64,12 @@ public class mechBehaviour : MonoBehaviour {
             Vector3 tempXZ = new Vector3(RB.velocity.x, 0f, RB.velocity.z);
             Vector3 tempY = new Vector3(0f, RB.velocity.y, 0f);
 
-            if (tempXZ.magnitude > topSpeed && boostAllowed > -0.5f)
-                RB.velocity = tempXZ.normalized*topSpeed + tempY;
+            if (tempXZ.magnitude > topSpeed && boostCooldown_Var > -boostCooldown + 0.5f)
+            {
+                RB.velocity = tempXZ.normalized * topSpeed + tempY;
+            }
+                
+                
         }
         //\\//\\//\\
 
@@ -103,26 +111,47 @@ public class mechBehaviour : MonoBehaviour {
             RB.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
 
         //If not on the ground increase landing recovery to 0.2, if on the ground decrease landing recovery over time.
-        if (!onGround) landRecovery = 0.2f;
-        else           landRecovery -= Time.deltaTime;
+        if (!onGround) 
+            landRecovery = 0.2f;
+        else
+        {
+            landRecovery -= Time.deltaTime;
+            boostNumber_Var = boostNumber;
+        }
         //\\//\\//\\
 
         ////Click Boost
         //If boost is on cooldown
-        if (boostAllowed < 0f)
+        if (boostCooldown_Var < 0f)
+            boostCooldown_Var += Time.deltaTime;
+
+        if (boostNumber_Var > 0)
+            boostLight.GetComponent<Light>().color = new Color(1f, 0.3f, 0f);
+
+        if (boostNumber_Var == 0)
+            boostLight.GetComponent<Light>().color = new Color(1f, 0.1f, 0f);
+
+        if (boostCooldown_Var < -boostCooldown+0.5f)
         {
-            boostAllowed += Time.deltaTime;
-            GameObject tempLight = Instantiate(dangerLight, transform.position, Quaternion.identity) as GameObject;
-            Destroy(tempLight, 0.05f);
+            GameObject tempLight = Instantiate(boostLight, transform.position - transform.forward, Quaternion.identity) as GameObject;
+            Destroy(tempLight, 0.2f);
         }
 
         //If player presses fire1 and boost is off cooldown.
-        if (fire1Axes != 0 && boostAllowed >= 0)
+        if (fire1Axes != 0 && boostCooldown_Var >= 0 && boostNumber_Var > 0)
         {
-            RB.AddForce(playerRay.direction * boostPower, ForceMode.Impulse);
-            boostAllowed = -1f;
+            RB.AddForce(transform.up + playerRay.direction * boostPower, ForceMode.Impulse);
+            boostCooldown_Var = -boostCooldown;
+            boostNumber_Var--;
         }
-
         //\\//\\//\\
+
+        ////Player Transparency
+        if (Vector3.Distance(transform.position, mainCamera.transform.position) <= 2f && transparency > 0)
+            transparency -= Time.deltaTime;
+        else if (transparency < 1)
+            transparency += Time.deltaTime;
+
+        GetComponent<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, transparency);
     }
 }

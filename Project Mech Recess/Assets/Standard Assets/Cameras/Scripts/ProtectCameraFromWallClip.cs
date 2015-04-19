@@ -13,6 +13,7 @@ namespace UnityStandardAssets.Cameras
         public float closestDistance = 0.5f;            // the closest distance the camera can be from the target
         public bool protecting { get; private set; }    // used for determining if there is an object between the target and the camera
         public string dontClipTag = "Player";           // don't clip against objects with this tag (useful for not clipping against the targeted object)
+        public GameObject playerObj;
 
         private Transform m_Cam;                  // the transform of the camera
         private Transform m_Pivot;                // the point at which the camera pivots around
@@ -22,7 +23,8 @@ namespace UnityStandardAssets.Cameras
         private Ray m_Ray;                        // the ray used in the lateupdate for casting between the camera and the target
         private RaycastHit[] m_Hits;              // the hits between the camera and the target
         private RayHitComparer m_RayHitComparer;  // variable to compare raycast hit distances
-
+        private Ray p_Ray;
+        private RaycastHit p_Hit;
 
         private void Start()
         {
@@ -44,9 +46,10 @@ namespace UnityStandardAssets.Cameras
 
             m_Ray.origin = m_Pivot.position + m_Pivot.forward*sphereCastRadius;
             m_Ray.direction = -m_Pivot.forward;
+            p_Ray = new Ray(m_Ray.origin, playerObj.transform.position - m_Ray.origin);
 
             // initial check to see if start of spherecast intersects anything
-            var cols = Physics.OverlapSphere(m_Ray.origin, sphereCastRadius);
+            Collider[] cols = Physics.OverlapSphere(m_Ray.origin, sphereCastRadius);
 
             bool initialIntersect = false;
             bool hitSomething = false;
@@ -61,11 +64,11 @@ namespace UnityStandardAssets.Cameras
                     break;
                 }
             }
-
             // if there is a collision
             if (initialIntersect)
             {
-                m_Ray.origin += m_Pivot.forward*sphereCastRadius;
+                Debug.DrawRay(m_Ray.origin, m_Ray.direction * (m_OriginalDist - sphereCastRadius), Color.yellow);
+                m_Ray.origin -= m_Pivot.forward*sphereCastRadius;
 
                 // do a raycast and gather all the intersections
                 m_Hits = Physics.RaycastAll(m_Ray, m_OriginalDist - sphereCastRadius);
@@ -86,9 +89,9 @@ namespace UnityStandardAssets.Cameras
             for (int i = 0; i < m_Hits.Length; i++)
             {
                 // only deal with the collision if it was closer than the previous one, not a trigger, and not attached to a rigidbody tagged with the dontClipTag
-                if (m_Hits[i].distance < nearest && (!m_Hits[i].collider.isTrigger) &&
+                if ((m_Hits[i].distance < nearest && (!m_Hits[i].collider.isTrigger) &&
                     !(m_Hits[i].collider.attachedRigidbody != null &&
-                      m_Hits[i].collider.attachedRigidbody.CompareTag(dontClipTag)))
+                      m_Hits[i].collider.attachedRigidbody.CompareTag(dontClipTag))))
                 {
                     // change the nearest collision to latest
                     nearest = m_Hits[i].distance;
@@ -96,19 +99,21 @@ namespace UnityStandardAssets.Cameras
                     hitSomething = true;
                 }
             }
-
             // visualise the cam clip effect in the editor
             if (hitSomething)
             {
                 Debug.DrawRay(m_Ray.origin, -m_Pivot.forward*(targetDist + sphereCastRadius), Color.red);
             }
-
             // hit something so move the camera to a better position
             protecting = hitSomething;
             m_CurrentDist = Mathf.SmoothDamp(m_CurrentDist, targetDist, ref m_MoveVelocity,
                                            m_CurrentDist > targetDist ? clipMoveTime : returnTime);
             m_CurrentDist = Mathf.Clamp(m_CurrentDist, closestDistance, m_OriginalDist);
-            m_Cam.localPosition = -Vector3.forward*m_CurrentDist;
+
+            Debug.DrawRay(m_Cam.transform.position, playerObj.transform.position - m_Cam.transform.position, Color.green);
+            p_Ray = new Ray(m_Cam.transform.position, playerObj.transform.position - m_Cam.transform.position);
+
+            m_Cam.localPosition = -Vector3.forward * m_CurrentDist;
         }
 
 
