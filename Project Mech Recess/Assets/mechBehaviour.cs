@@ -39,9 +39,6 @@ public class mechBehaviour : MonoBehaviour {
 	}
 	
 	void Start () {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         reticleObj = Instantiate(reticleObj, transform.position, Quaternion.identity) as GameObject;
 	}
 
@@ -75,25 +72,49 @@ public class mechBehaviour : MonoBehaviour {
 
         ////Reticle
         //Getting the ray from the center of the camera, forwards.
-        Ray cameraRay = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
-        RaycastHit cameraRayHit;
         Vector3 defaultPoint = mainCamera.transform.position + mainCamera.transform.forward * reticleMaxDistance;
 
+        Ray cameraRay = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
+        RaycastHit[] cameraRayHit = Physics.RaycastAll(cameraRay, reticleMaxDistance);
+
         //Firing a new ray from the player, to the first point of collision from the camera ray.
-        Ray playerRay; 
-        if (Physics.Raycast(cameraRay, out cameraRayHit, reticleMaxDistance)) //Determine whether raycast hits terrain or not.
-            playerRay = new Ray(transform.position, (transform.position - cameraRayHit.point).normalized * -reticleMaxDistance);
+        Ray playerRay = new Ray();
+        RaycastHit[] playerRayHit;
+
+        float nearest = Mathf.Infinity;
+        if (cameraRayHit.Length > 0)
+        {
+            foreach (RaycastHit cameraHitInfo in cameraRayHit)
+            {
+                if (cameraHitInfo.distance < nearest)
+                {
+                    nearest = cameraHitInfo.distance;
+                    if (cameraHitInfo.collider.tag != "Player")
+                        playerRay = new Ray(transform.position, (transform.position - cameraHitInfo.point).normalized * -reticleMaxDistance);
+                }
+            }
+        }
         else
             playerRay = new Ray(transform.position, (transform.position - defaultPoint).normalized * -reticleMaxDistance);
 
+        playerRayHit = Physics.RaycastAll(playerRay, reticleMaxDistance);
+
         //If player ray hits terrain move the reticle to the point of collision. If it hits nothing move it to default point.
-        RaycastHit playerRayHit;
-        if (Physics.Raycast(playerRay, out playerRayHit, reticleMaxDistance))
-            reticleObj.transform.position = playerRayHit.point;
+        nearest = Mathf.Infinity;
+        if (playerRayHit.Length > 0)
+        {
+            foreach (RaycastHit playerRayHitInfo in playerRayHit)
+            {
+                if (playerRayHitInfo.distance < nearest)
+                {
+                    nearest = playerRayHitInfo.distance;
+                    if (playerRayHitInfo.collider.tag != "Player")
+                        reticleObj.transform.position = playerRayHitInfo.point;
+                }
+            }
+        }
         else
             reticleObj.transform.position = defaultPoint;
-        
-
         
 
         //\\//\\//\\
@@ -147,7 +168,7 @@ public class mechBehaviour : MonoBehaviour {
         //\\//\\//\\
 
         ////Player Transparency
-        if (Vector3.Distance(transform.position, mainCamera.transform.position) <= 2f && transparency > 0)
+        if (Vector3.Distance(transform.position, mainCamera.transform.position) <= 3f && transparency > 0)
             transparency -= Time.deltaTime;
         else if (transparency < 1)
             transparency += Time.deltaTime;

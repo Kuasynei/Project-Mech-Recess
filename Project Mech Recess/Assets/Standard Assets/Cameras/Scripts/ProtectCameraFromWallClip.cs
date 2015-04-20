@@ -24,7 +24,7 @@ namespace UnityStandardAssets.Cameras
         private RaycastHit[] m_Hits;              // the hits between the camera and the target
         private RayHitComparer m_RayHitComparer;  // variable to compare raycast hit distances
         private Ray p_Ray;
-        private RaycastHit p_Hit;
+        private RaycastHit[] p_Hits;
 
         private void Start()
         {
@@ -46,7 +46,6 @@ namespace UnityStandardAssets.Cameras
 
             m_Ray.origin = m_Pivot.position + m_Pivot.forward*sphereCastRadius;
             m_Ray.direction = -m_Pivot.forward;
-            p_Ray = new Ray(m_Ray.origin, playerObj.transform.position - m_Ray.origin);
 
             // initial check to see if start of spherecast intersects anything
             Collider[] cols = Physics.OverlapSphere(m_Ray.origin, sphereCastRadius);
@@ -67,7 +66,7 @@ namespace UnityStandardAssets.Cameras
             // if there is a collision
             if (initialIntersect)
             {
-                Debug.DrawRay(m_Ray.origin, m_Ray.direction * (m_OriginalDist - sphereCastRadius), Color.yellow);
+                Debug.DrawRay(m_Ray.origin, m_Ray.direction * (m_OriginalDist - sphereCastRadius), Color.yellow); //[CUSTOM]
                 m_Ray.origin -= m_Pivot.forward*sphereCastRadius;
 
                 // do a raycast and gather all the intersections
@@ -104,15 +103,42 @@ namespace UnityStandardAssets.Cameras
             {
                 Debug.DrawRay(m_Ray.origin, -m_Pivot.forward*(targetDist + sphereCastRadius), Color.red);
             }
+            
+            // [CUSTOM] Extra Hit Detection, new raycast
+            Vector3 tempCustomTarget = new Vector3(playerObj.transform.position.x, m_Pivot.transform.position.y, playerObj.transform.position.z);
+            Debug.DrawRay(tempCustomTarget, m_Cam.transform.position - tempCustomTarget, Color.green);
+            p_Ray = new Ray(tempCustomTarget, (m_Cam.transform.position - tempCustomTarget));
+            p_Ray.origin += ((m_Cam.transform.position - tempCustomTarget).normalized)*0.1f;
+            p_Hits = Physics.RaycastAll(p_Ray, m_OriginalDist);
+
+            if (p_Hits.Length <= 0)
+            {
+                p_Hits = Physics.SphereCastAll(p_Ray, sphereCastRadius, m_OriginalDist + sphereCastRadius);
+            }
+            
+            // Loop through all collisions
+            for (int i = 0; i < p_Hits.Length; i++)
+            {
+                if (p_Hits[i].distance < nearest && p_Hits[i].collider != null &&
+                    !p_Hits[i].collider.CompareTag(dontClipTag))
+                {
+                    nearest = p_Hits[i].distance;
+                    targetDist = (m_Cam.transform.position - tempCustomTarget).magnitude;
+                    Debug.Log(targetDist);
+                }
+            }
+
+            //if (customHit && !hitSomething)
+            // {
+            //    m_Cam.position = Vector3.MoveTowards(m_Cam.position, tempCustomTarget, m_CurrentDist / 20);
+            //}
+            //\\//\\//\\
+
             // hit something so move the camera to a better position
             protecting = hitSomething;
             m_CurrentDist = Mathf.SmoothDamp(m_CurrentDist, targetDist, ref m_MoveVelocity,
                                            m_CurrentDist > targetDist ? clipMoveTime : returnTime);
             m_CurrentDist = Mathf.Clamp(m_CurrentDist, closestDistance, m_OriginalDist);
-
-            Debug.DrawRay(m_Cam.transform.position, playerObj.transform.position - m_Cam.transform.position, Color.green);
-            p_Ray = new Ray(m_Cam.transform.position, playerObj.transform.position - m_Cam.transform.position);
-
             m_Cam.localPosition = -Vector3.forward * m_CurrentDist;
         }
 
