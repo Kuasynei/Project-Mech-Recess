@@ -11,9 +11,9 @@ public class mechBehaviour : MonoBehaviour {
     public float boostCooldown = 1f;
     public int boostNumber = 2;
     public float reticleMaxDistance = 100f;
+    public bool onGround = false;
 
     //Private Stat Variables
-    private bool onGround = false;
     private float landRecovery = 0.2f;
     private float boostCooldown_Var = 0f;
     private int boostNumber_Var = 0;

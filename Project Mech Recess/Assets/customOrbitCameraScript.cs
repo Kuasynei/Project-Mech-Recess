@@ -78,21 +78,21 @@ public class customOrbitCameraScript : MonoBehaviour {
         cameraTransform.localRotation = Quaternion.Slerp(cameraTransform.localRotation, cameraRotation, turnSmoothing * Time.deltaTime);
 
         //Adds and subtracts height based on the angle of the camera
-        pivotTransform.localPosition = Vector3.Lerp(pivotTransform.localPosition, new Vector3(pivotTransform.localPosition.x, pivotOffset.localPosition.y * (cameraRotation.x+0.2f) * 7, 
-                                                    pivotOffset.localPosition.z * (cameraRotation.x+0.5f)), cameraSpeed * Time.deltaTime);
-        Debug.Log("CAMERA Y: " + cameraTransform.position.y + "| PLAYER Y: " + player.transform.position.y + "|Y MOD: " + pivotTransform.position.y * (cameraRotation.x + 1) * 2);
-
+        pivotTransform.position = Vector3.Slerp(pivotTransform.position,
+                                                       new Vector3(pivotOffset.position.x, pivotOffset.position.y * (cameraRotation.x) * 5, pivotTransform.position.z), 
+                                                       turnSmoothing * Time.deltaTime);
+        Debug.Log("CAMERA Y: " + cameraTransform.position.y + "| PLAYER Y: " + player.transform.position.y + "|X rotation: " + (cameraRotation.x) * 7);
         //\\//\\//\\
-
+        
         ////Ray for pivot object to prevent clipping.
-        pivotRay = new Ray(transform.position, (pivotOffset.position - transform.position).normalized * maxDistance);
-        pivotRay.origin -= pivotRay.direction.normalized * 0.1f;
-        Debug.DrawRay(transform.position - pivotRay.direction.normalized * 0.1f, (pivotOffset.position - transform.position).normalized * maxDistance);
-        //pivotRayHits = Physics.RaycastAll(pivotRay, maxDistance);
+        pivotRay = new Ray(transform.position, (new Vector3(pivotOffset.position.x, pivotOffset.position.y * (cameraRotation.x) * 5, pivotOffset.position.z) - transform.position).normalized * maxDistance);
+        Debug.DrawRay(transform.position,
+            (new Vector3(pivotOffset.position.x, pivotOffset.position.y * (cameraRotation.x) * 5, pivotOffset.position.z) - transform.position).normalized * (maxDistance+3f), Color.magenta);
+        //\\//\\//\\
 
         ////Camera Spherecast to detect collision
         pivotRayHits = Physics.SphereCastAll(pivotRay, sphereCastRadius, maxDistance + sphereCastRadius);
-
+        
         //Determine closest collision point on pivotRayHits.
         float nearest = Mathf.Infinity;
         for (int i = 0; i < pivotRayHits.Length; i++)
@@ -102,51 +102,19 @@ public class customOrbitCameraScript : MonoBehaviour {
                 nearest = pivotRayHits[i].distance;
                 if (pivotRayHits[i].collider.tag != player.gameObject.tag) //If closest collision point and not the player, move pivot there.
                 {
-                    Debug.DrawLine(pivotTransform.position, pivotRayHits[i].point - pivotRay.direction, Color.blue);
-                    pivotTransform.position = Vector3.SmoothDamp(pivotTransform.position, pivotRayHits[i].point - pivotRay.direction,
-                        ref pivotDampenerVelocity, clipSmoothing, clipMaxCorrectSpeed);
-
-                    //Debug.Log(pivotRayHits[i].distance);
+                    if (pivotTransform.position.y > player.transform.position.y)
+                    {
+                        Debug.DrawLine(pivotTransform.position, new Vector3(pivotRayHits[i].point.x, pivotTransform.position.y, pivotRayHits[i].point.z) - pivotRay.direction, Color.blue);
+                    }
+                    else
+                    {
+                        Debug.DrawLine(pivotTransform.position, new Vector3(pivotRayHits[i].point.x, pivotRayHits[i].point.y, pivotRayHits[i].point.z) - pivotRay.direction, Color.cyan);
+                    }
+                    
+                    
                     //Debug.Log("Cinder");
                 }
             }
-        }
-
-        //\\//\\//\\
-
-        ////Left and Right Camera Bumpers [U/C]
-        /*
-        Ray rightRay = new Ray(pivotTransform.position, pivotTransform.right);
-        RaycastHit rightRayHit;
-        Debug.DrawRay(pivotTransform.position, pivotTransform.right, Color.cyan);
-        if (Physics.Raycast(rightRay, 1f))
-        {
-            Debug.Log("Shock");
-            pivotTransform.tra
-        }
-
-
-        Ray leftRay = new Ray(pivotTransform.position, -pivotTransform.right);
-        RaycastHit leftRayHit;
-        Debug.DrawRay(pivotTransform.position, -pivotTransform.right, Color.magenta);
-         */
-        //\\//\\//\\
-
-        ////If no Collisions (excluding the one with the player) then resume normal function.
-        if ((pivotRayHits.Length <= 1 && pivotRayHits.Length > 0) /*&& !(Physics.Raycast(rightRay, 1f) || Physics.Raycast(leftRay, 1f))*/)
-        {
-            //Debug.Log("Ash");
-            if (pivotRayHits[0].collider.tag == player.gameObject.tag)
-            {
-                pivotTransform.position = Vector3.SmoothDamp(pivotTransform.position, pivotOffset.position,
-                    ref pivotDampenerVelocity, clipSmoothing, clipMaxCorrectSpeed);
-            }
-        }
-        else if (pivotRayHits.Length <= 0)
-        {
-            //Debug.Log("Coal");
-            pivotTransform.position = Vector3.SmoothDamp(pivotTransform.position, pivotOffset.position,
-                ref pivotDampenerVelocity, clipSmoothing, clipMaxCorrectSpeed);
         }
         //\\//\\//\\
     }
