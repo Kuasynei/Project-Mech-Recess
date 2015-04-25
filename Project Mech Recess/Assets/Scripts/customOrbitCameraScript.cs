@@ -42,13 +42,11 @@ public class customOrbitCameraScript : MonoBehaviour {
         ////Set pivotTransform to position of the pivot object when the game starts.
         pivotTransform = transform.FindChild("Pivot").GetComponent<Transform>();
         pivotOffset = transform.FindChild("Pivot Set").GetComponent<Transform>();
-        //\\//\\//\\
 
         //Get Camera Transform
         cameraTransform = GetComponentInChildren<Camera>().transform;
 
         cameraEulers = cameraTransform.rotation.eulerAngles;
-        //\\//\\//\\
     }
 
     void Update()
@@ -56,19 +54,16 @@ public class customOrbitCameraScript : MonoBehaviour {
         ////Player Camera Follow
         if (player == null) return;
         transform.position = Vector3.Slerp(transform.position, player.position, cameraSpeed * Time.deltaTime);
-        //\\//\\//\\
 
         ////Input
         mouseX = Input.GetAxis("Mouse X");
         mouseY = Input.GetAxis("Mouse Y");
-        //\\//\\//\\
 
         ////X Rotation of Rig
         rigLookAngle += mouseX * turnSpeed;
         rigRotation = Quaternion.Euler(0f, rigLookAngle, 0f);
 
         transform.localRotation = Quaternion.Slerp(transform.localRotation, rigRotation, turnSmoothing * Time.deltaTime);
-        //\\//\\//\\
 
         ////Y Rotation of Camera
         cameraTiltAngle -= mouseY * turnSpeed;
@@ -77,14 +72,12 @@ public class customOrbitCameraScript : MonoBehaviour {
         cameraRotation = Quaternion.Euler(cameraTiltAngle, cameraEulers.y, cameraEulers.z);
         cameraTransform.localRotation = Quaternion.Slerp(cameraTransform.localRotation, cameraRotation, turnSmoothing * Time.deltaTime);
         //Debug.Log("CAMERA Y: " + pivotTransform.position.y + "| PLAYER Y: " + player.transform.position.y + "|X rotation: " + (cameraRotation.x + 0.1f) * 2);
-        //\\//\\//\\
         
         ////ray for pivot object to prevent clipping.
         pivotRay = new Ray(transform.position, 
             (new Vector3(pivotOffset.position.x, pivotOffset.position.y + (cameraRotation.x - 0.1f) * 7, pivotOffset.position.z) - transform.position).normalized * maxDistance);
         Debug.DrawRay(transform.position,
             (new Vector3(pivotOffset.position.x, pivotOffset.position.y + (cameraRotation.x - 0.1f) * 7, pivotOffset.position.z) - transform.position).normalized * maxDistance, Color.magenta);
-        //\\//\\//\\
 
         ////Camera Spherecast to detect collision
         pivotRayHits = Physics.SphereCastAll(pivotRay, sphereCastRadius, maxDistance + sphereCastRadius);
@@ -106,8 +99,6 @@ public class customOrbitCameraScript : MonoBehaviour {
                 }
             }
         }
-        
-        //\\//\\//\\
 
         ////If camera does not collide.
         if (nearest == Mathf.Infinity)
@@ -115,6 +106,5 @@ public class customOrbitCameraScript : MonoBehaviour {
             //Debug.Log("Magma");
             pivotTransform.position = Vector3.Slerp(pivotTransform.position, transform.position + pivotRay.direction*maxDistance, turnSmoothing * Time.deltaTime);
         }
-        //\\//\\//\\
     }
 }

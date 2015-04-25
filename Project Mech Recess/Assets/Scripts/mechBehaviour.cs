@@ -49,18 +49,17 @@ public class mechBehaviour : MonoBehaviour {
         vAxesInput = Input.GetAxis("Vertical");
         jumpAxes = Input.GetAxis("Jump");
         fire1Axes = Input.GetAxis("Fire1");
-        //\\//\\//\\
 
         ////Horizontal Movement
         RB.AddForce(new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z) * acceleration * vAxesInput);
         RB.AddForce(new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z) * acceleration * hAxesInput);
-        //\\//\\//\\
 
         ////Speed Limit
         {
             Vector3 tempXZ = new Vector3(RB.velocity.x, 0f, RB.velocity.z);
             Vector3 tempY = new Vector3(0f, RB.velocity.y, 0f);
 
+            //Limit only horizontal speed
             if (tempXZ.magnitude > topSpeed && boostCooldown_Var > -boostCooldown + 0.5f)
             {
                 RB.velocity = tempXZ.normalized * topSpeed + tempY;
@@ -68,7 +67,6 @@ public class mechBehaviour : MonoBehaviour {
                 
                 
         }
-        //\\//\\//\\
 
         ////Reticle
         //Getting the ray from the center of the camera, forwards.
@@ -115,9 +113,6 @@ public class mechBehaviour : MonoBehaviour {
         }
         else
             reticleObj.transform.position = defaultPoint;
-        
-
-        //\\//\\//\\
 
         ////Jump
         //Ground Detection
@@ -139,7 +134,6 @@ public class mechBehaviour : MonoBehaviour {
             landRecovery -= Time.deltaTime;
             boostNumber_Var = boostNumber;
         }
-        //\\//\\//\\
 
         ////Click Boost
         //If boost is on cooldown
@@ -161,11 +155,10 @@ public class mechBehaviour : MonoBehaviour {
         //If player presses fire1 and boost is off cooldown.
         if (fire1Axes != 0 && boostCooldown_Var >= 0 && boostNumber_Var > 0)
         {
-            RB.AddForce(transform.up + new Ray(transform.position, (cameraRay.direction * reticleMaxDistance) - transform.position).direction * boostPower, ForceMode.Impulse);
+            RB.AddForce(cameraRay.direction * boostPower, ForceMode.Impulse);
             boostCooldown_Var = -boostCooldown;
             boostNumber_Var--;
         }
-        //\\//\\//\\
 
         ////Player Transparency
         if (Vector3.Distance(transform.position, mainCamera.transform.position) <= 3f && transparency > 0)
@@ -174,6 +167,5 @@ public class mechBehaviour : MonoBehaviour {
             transparency += Time.deltaTime*2;
 
         GetComponent<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, transparency);
-        //\\//\\//\\
     }
 }
