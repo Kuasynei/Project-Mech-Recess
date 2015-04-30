@@ -42,7 +42,7 @@ public class mechBehaviour : MonoBehaviour {
         reticleObj = Instantiate(reticleObj, transform.position, Quaternion.identity) as GameObject;
 	}
 
-	void Update()
+    void Update()
     {
         ////Input
         hAxesInput = Input.GetAxis("Horizontal");
@@ -50,9 +50,16 @@ public class mechBehaviour : MonoBehaviour {
         jumpAxes = Input.GetAxis("Jump");
         fire1Axes = Input.GetAxis("Fire1");
 
+        ////Cursor Relock
+        if (Cursor.lockState != CursorLockMode.Locked && fire1Axes != 0)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
         ////Horizontal Movement
-        RB.AddForce(new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z) * acceleration * vAxesInput);
-        RB.AddForce(new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z) * acceleration * hAxesInput);
+        RB.AddForce(new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z) * acceleration * vAxesInput * Time.deltaTime);
+        RB.AddForce(new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z) * acceleration * hAxesInput * Time.deltaTime);
 
         ////Speed Limit
         {
@@ -64,8 +71,8 @@ public class mechBehaviour : MonoBehaviour {
             {
                 RB.velocity = tempXZ.normalized * topSpeed + tempY;
             }
-                
-                
+
+
         }
 
         ////Reticle
@@ -124,10 +131,10 @@ public class mechBehaviour : MonoBehaviour {
 
         //If on the ground, not recovering, and the jump buttons were pressed.
         if (jumpAxes != 0 && onGround && landRecovery <= 0f)
-            RB.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
+            RB.AddForce(0f, jumpPower * Time.deltaTime, 0f, ForceMode.Impulse);
 
         //If not on the ground increase landing recovery to 0.2, if on the ground decrease landing recovery over time.
-        if (!onGround) 
+        if (!onGround)
             landRecovery = 0.2f;
         else
         {
@@ -146,7 +153,7 @@ public class mechBehaviour : MonoBehaviour {
         if (boostNumber_Var == 0)
             boostLight.GetComponent<Light>().color = new Color(1f, 0.1f, 0f);
 
-        if (boostCooldown_Var < -boostCooldown+0.5f)
+        if (boostCooldown_Var < -boostCooldown + 0.5f)
         {
             GameObject tempLight = Instantiate(boostLight, transform.position - transform.forward, Quaternion.identity) as GameObject;
             Destroy(tempLight, 0.2f);
@@ -155,17 +162,22 @@ public class mechBehaviour : MonoBehaviour {
         //If player presses fire1 and boost is off cooldown.
         if (fire1Axes != 0 && boostCooldown_Var >= 0 && boostNumber_Var > 0)
         {
-            RB.AddForce(cameraRay.direction * boostPower, ForceMode.Impulse);
+            RB.AddForce(cameraRay.direction * boostPower * Time.deltaTime, ForceMode.Impulse);
             boostCooldown_Var = -boostCooldown;
             boostNumber_Var--;
         }
 
         ////Player Transparency
         if (Vector3.Distance(transform.position, mainCamera.transform.position) <= 3f && transparency > 0)
-            transparency -= Time.deltaTime*2;
+            transparency -= Time.deltaTime * 2;
         else if (transparency < 1)
-            transparency += Time.deltaTime*2;
+            transparency += Time.deltaTime * 2;
 
         GetComponent<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, transparency);
+    }
+
+    void OnTriggerStay(Collider coll)
+    {
+        Debug.DrawRay(coll.transform.position, transform.position - coll.transform.position, Color.green);
     }
 }

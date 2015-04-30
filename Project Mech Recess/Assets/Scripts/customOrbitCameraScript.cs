@@ -31,12 +31,6 @@ public class customOrbitCameraScript : MonoBehaviour {
 
     private Vector3 pivotDampenerVelocity;
 
-    void Awake()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-
     void Start()
     {
         ////Set pivotTransform to position of the pivot object when the game starts.
