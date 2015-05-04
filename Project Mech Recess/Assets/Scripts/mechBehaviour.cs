@@ -66,8 +66,8 @@ public class mechBehaviour : MonoBehaviour {
             Vector3 tempXZ = new Vector3(RB.velocity.x, 0f, RB.velocity.z);
             Vector3 tempY = new Vector3(0f, RB.velocity.y, 0f);
 
-            //Limit only horizontal speed
-            if (tempXZ.magnitude > topSpeed && boostCooldown_Var > -boostCooldown + 0.5f)
+            //Limit only horizontal speed if the player's boost not being used.
+            if (tempXZ.magnitude > topSpeed && boostCooldown_Var < boostCooldown - 0.5f)
             {
                 RB.velocity = tempXZ.normalized * topSpeed + tempY;
             }
@@ -139,13 +139,13 @@ public class mechBehaviour : MonoBehaviour {
         else
         {
             landRecovery -= Time.deltaTime;
-            boostNumber_Var = boostNumber;
+            boostNumber_Var = boostNumber; //Available boosts refill to max
         }
 
         ////Click Boost
         //If boost is on cooldown
-        if (boostCooldown_Var < 0f)
-            boostCooldown_Var += Time.deltaTime;
+        if (boostCooldown_Var > 0f)
+            boostCooldown_Var -= Time.deltaTime;
 
         if (boostNumber_Var > 0)
             boostLight.GetComponent<Light>().color = new Color(1f, 0.3f, 0f);
@@ -153,17 +153,18 @@ public class mechBehaviour : MonoBehaviour {
         if (boostNumber_Var == 0)
             boostLight.GetComponent<Light>().color = new Color(1f, 0.1f, 0f);
 
-        if (boostCooldown_Var < -boostCooldown + 0.5f)
+        //If boost is currently being performed.
+        if (boostCooldown_Var > boostCooldown - 0.5f)
         {
             GameObject tempLight = Instantiate(boostLight, transform.position - transform.forward, Quaternion.identity) as GameObject;
             Destroy(tempLight, 0.2f);
         }
 
         //If player presses fire1 and boost is off cooldown.
-        if (fire1Axes != 0 && boostCooldown_Var >= 0 && boostNumber_Var > 0)
+        if (fire1Axes != 0 && boostCooldown_Var <= 0 && boostNumber_Var > 0)
         {
             RB.AddForce(cameraRay.direction * boostPower * Time.deltaTime, ForceMode.Impulse);
-            boostCooldown_Var = -boostCooldown;
+            boostCooldown_Var = boostCooldown;
             boostNumber_Var--;
         }
 
@@ -174,10 +175,5 @@ public class mechBehaviour : MonoBehaviour {
             transparency += Time.deltaTime * 2;
 
         GetComponent<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, transparency);
-    }
-
-    void OnTriggerStay(Collider coll)
-    {
-        Debug.DrawRay(coll.transform.position, transform.position - coll.transform.position, Color.green);
     }
 }

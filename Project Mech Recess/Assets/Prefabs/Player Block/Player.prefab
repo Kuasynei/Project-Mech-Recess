@@ -93,7 +93,7 @@ MonoBehaviour:
   acceleration: 8000
   topSpeed: 10
   jumpPower: 325
-  boostPower: 1800
+  boostPower: 3000
   boostCooldown: 1
   boostNumber: 2
   reticleMaxDistance: 100
