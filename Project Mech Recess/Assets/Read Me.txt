@@ -1,0 +1,8 @@
+HOW TO PLAY
+-----------
+WASD or ARROW KEYS 		:Move
+Mouse 				:Aim
+Left Mouse Button / Left Ctrl 	:Boost
+Space				:Jump
+
+TIP 1: Boosting right after a jump is always better than boosting just before.
