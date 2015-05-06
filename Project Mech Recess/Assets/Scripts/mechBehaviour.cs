@@ -11,13 +11,14 @@ public class mechBehaviour : MonoBehaviour {
     public float boostCooldown = 1f;
     public int boostNumber = 2;
     public float reticleMaxDistance = 100f;
-    public bool onGround = false;
 
     //Private Stat Variables
     private float landRecovery = 0.2f;
     private float boostCooldown_Var = 0f;
     private int boostNumber_Var = 0;
     private float transparency = 1;
+    private bool onGround = false;
+    private bool onWall = false;
 
     //Input Variables
 	private float hAxesInput;
@@ -58,8 +59,8 @@ public class mechBehaviour : MonoBehaviour {
         }
 
         ////Horizontal Movement
-        RB.AddForce(new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z) * acceleration * vAxesInput * Time.deltaTime);
-        RB.AddForce(new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z) * acceleration * hAxesInput * Time.deltaTime);
+        RB.AddForce(new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z) * acceleration * vAxesInput);
+        RB.AddForce(new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z) * acceleration * hAxesInput);
 
         ////Speed Limit
         {
@@ -163,7 +164,7 @@ public class mechBehaviour : MonoBehaviour {
         //If player presses fire1 and boost is off cooldown.
         if (fire1Axes != 0 && boostCooldown_Var <= 0 && boostNumber_Var > 0)
         {
-            RB.AddForce(cameraRay.direction * boostPower * Time.deltaTime, ForceMode.Impulse);
+            RB.AddForce(cameraRay.direction * boostPower + transform.up * 1.2f, ForceMode.Impulse);
             boostCooldown_Var = boostCooldown;
             boostNumber_Var--;
         }

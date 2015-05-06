@@ -13,7 +13,6 @@ GameObject:
   - 23: {fileID: 2327624}
   - 54: {fileID: 5427754}
   - 114: {fileID: 11471368}
-  - 135: {fileID: 13507418}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -90,29 +89,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7000482911b0ee744a5ea7c79d958bc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 8000
+  acceleration: 125
   topSpeed: 10
-  jumpPower: 325
-  boostPower: 3000
+  jumpPower: 260
+  boostPower: 35
   boostCooldown: 1
   boostNumber: 2
   reticleMaxDistance: 100
-  onGround: 0
   mainCamera: {fileID: 0}
   reticleObj: {fileID: 117034, guid: 55dc516ea4afec140bc0f23aea11b27d, type: 2}
   boostLight: {fileID: 134106, guid: f0a193ef916fffd489c6b324a62d1785, type: 2}
---- !u!135 &13507418
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 133454}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: .600000024
-  m_Center: {x: 0, y: -.349999994, z: 0}
 --- !u!136 &13638188
 CapsuleCollider:
   m_ObjectHideFlags: 1
