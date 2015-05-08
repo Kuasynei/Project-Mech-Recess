@@ -81,7 +81,7 @@ public class mechBehaviour : MonoBehaviour {
 
         //Wall jump turn limiter
         if (wallJumpTurnSpeed < 1)
-            wallJumpTurnSpeed += Time.deltaTime/2;
+            wallJumpTurnSpeed += Time.deltaTime/3;
         else
             wallJumpTurnSpeed = 1;
 
@@ -211,7 +211,7 @@ public class mechBehaviour : MonoBehaviour {
         //If player presses fire1 and boost is off cooldown.
         if (fire1Axes != 0 && boostCooldown_Var <= 0 && boostNumber_Var > 0)
         {
-            RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 1.2f, ForceMode.Impulse);
+            RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 2f, ForceMode.Impulse);
             boostCooldown_Var = boostCooldown;
             boostNumber_Var--;
         }
