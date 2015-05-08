@@ -13,6 +13,7 @@ GameObject:
   - 23: {fileID: 2327624}
   - 54: {fileID: 5427754}
   - 114: {fileID: 11471368}
+  - 135: {fileID: 13566722}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -99,6 +100,19 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   reticleObj: {fileID: 117034, guid: 55dc516ea4afec140bc0f23aea11b27d, type: 2}
   boostLight: {fileID: 134106, guid: f0a193ef916fffd489c6b324a62d1785, type: 2}
+  dustSystem: {fileID: 158188, guid: b143ce65b124ead4ab60090f034d97ff, type: 2}
+--- !u!135 &13566722
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 133454}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: .550000012
+  m_Center: {x: 0, y: .400000006, z: 0}
 --- !u!136 &13638188
 CapsuleCollider:
   m_ObjectHideFlags: 1

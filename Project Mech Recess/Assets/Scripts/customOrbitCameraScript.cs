@@ -101,9 +101,4 @@ public class customOrbitCameraScript : MonoBehaviour {
             pivotTransform.position = Vector3.Slerp(pivotTransform.position, transform.position + pivotRay.direction*maxDistance, turnSmoothing * Time.deltaTime);
         }
     }
-
-    void OnCollisionEnter(Collision coll)
-    {
-        Debug.Log("SUPER HOT. SUPER HOT.");
-    }
 }
