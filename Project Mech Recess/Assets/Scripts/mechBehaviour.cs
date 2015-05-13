@@ -7,26 +7,35 @@ public class mechBehaviour : MonoBehaviour {
 	public float acceleration = 5f;
     public float topSpeed = 10f;
     public float jumpPower = 10f;
-    public float boostPower = 10f;
-    public float boostCooldown = 1f;
-    public int boostNumber = 2;
-    public float reticleMaxDistance = 100f;
+    public float turnSpeed = 10f;
+
+    public float boostPower = 10f; 				//Power of the boost
+    public float boostCooldown = 1f; 			//Max time before boost can be used again.
+    public int boostNumber = 2; 				//Maximum number of boosts.
+
+    public float reticleMaxDistance = 100f; 	//If the reticle doesn't hit any colliders.
 
     //Private Stat Variables
-    private float landRecovery = 0.2f;
-    private float boostCooldown_Var = 0f;
-    private int boostNumber_Var = 0;
-    private float transparency = 1;
-    private bool onGround = false;
-    private bool onWall = false;
-    private bool inWallRun = false;
-    private float wallJumpTurnSpeed = 1f;
+    private float boostCooldown_Var = 0f;	 	//Player's current time available before boost is available.
+    private int boostNumber_Var = 0;		 	//Player's current available boosts.
+	
+	private float landRecovery = 0.1f;			//Allow the system to register the player landing.
+	private bool onGround = false;
+	private bool onWall = false;
+	private bool inWallRun = false;
+	private float wallJumpTurnSpeed = 1f;		//Prevent player from jumping back onto a wall infinitely to climb it.
+	
+	private bool isChaser = false;
+    private bool isAttacking = false;
+
+	private float transparency = 1;				//To allow transparency fading for the player.
 
     //Input Variables
 	private float hAxesInput;
 	private float vAxesInput;
     private float jumpAxes;
     private float fire1Axes;
+    private float fire2Axes;
     private bool shiftTechInput;
 
     //Public Components
@@ -51,6 +60,28 @@ public class mechBehaviour : MonoBehaviour {
         windSystem.transform.rotation = Quaternion.Euler(-90, 0, 0);
 	}
 
+    void FixedUpdate()
+    {
+        ////Wind FX
+        //Wind that appears below player to help with landing
+        RaycastHit verticalAlignHit;
+        if (Physics.Raycast(transform.position, -transform.up, out verticalAlignHit, 30f))
+        {
+            windSystem.transform.position = verticalAlignHit.point;
+            if (!windSystem.GetComponent<ParticleSystem>().isPlaying)
+            {
+                windSystem.GetComponent<ParticleSystem>().Play();
+            }
+        }
+        else
+            windSystem.GetComponent<ParticleSystem>().Stop();
+
+        //Wind to indicate exceeding regular top speed
+        speedWind.transform.position = transform.position;
+        speedWind.transform.LookAt(RB.velocity + transform.position, transform.up);
+        speedWind.GetComponent<ParticleSystem>().emissionRate = (RB.velocity.magnitude - (topSpeed + 5f)) * 20;
+    }
+
     void Update()
     {
         ////Input
@@ -58,6 +89,7 @@ public class mechBehaviour : MonoBehaviour {
         vAxesInput = Input.GetAxis("Vertical");
         jumpAxes = Input.GetAxis("Jump");
         fire1Axes = Input.GetAxis("Fire1");
+        fire2Axes = Input.GetAxis("Fire2");
         shiftTechInput = Input.GetKey(KeyCode.LeftShift);
 
         ////Cursor Relock
@@ -86,8 +118,17 @@ public class mechBehaviour : MonoBehaviour {
             wallJumpTurnSpeed = 1;
 
         ////Horizontal Movement
-        RB.AddForce(new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z) * acceleration * vAxesInput * wallDampener * wallJumpTurnSpeed * (boostCooldown_Var + 1));
-        RB.AddForce(new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z) * acceleration * hAxesInput * wallDampener * wallJumpTurnSpeed * (boostCooldown_Var + 1));
+		RB.AddForce(new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z) * (acceleration * Time.deltaTime * 100f)
+		            * vAxesInput * wallDampener * wallJumpTurnSpeed * (boostCooldown_Var + 1));
+		RB.AddForce(new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z) * (acceleration * Time.deltaTime * 100f)
+		            * hAxesInput * wallDampener * wallJumpTurnSpeed * (boostCooldown_Var + 1));
+
+        ////Rotate Towards Movement
+        if (Quaternion.LookRotation(new Vector3(RB.velocity.normalized.x, 0, RB.velocity.normalized.z)) != new Quaternion(0,0,0,0))
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(new Vector3(RB.velocity.normalized.x, 0, RB.velocity.normalized.z)), 
+                                                            Mathf.Clamp(RB.velocity.magnitude, 3f, 20f));
+        }
 
         ////Speed Limit
         {
@@ -99,13 +140,12 @@ public class mechBehaviour : MonoBehaviour {
             {
                 RB.velocity = tempXZ.normalized * topSpeed + tempY;
             }
-            else if (boostCooldown_Var > 0)
+            else if (boostCooldown_Var > 0)//Hard Limit
             {
-                RB.velocity = new Vector3(Mathf.Clamp(tempXZ.x, -20, 20), Mathf.Clamp(tempY.y, -20, 20), Mathf.Clamp(tempXZ.z, -20, 20));
-                Debug.Log(tempY);
-            }
-
-        }
+				RB.velocity = new Vector3(Mathf.Clamp(tempXZ.x, -15, 15), Mathf.Clamp(tempY.y, -12, 12), Mathf.Clamp(tempXZ.z, -15, 15));
+			}
+			
+		}
 
         ////Reticle
         //Getting the ray from the center of the camera, forwards.
@@ -156,7 +196,7 @@ public class mechBehaviour : MonoBehaviour {
         ////Jumps
         //Ground Detection
         RaycastHit groundHit;
-        if (Physics.Raycast(transform.position, -transform.up, out groundHit, transform.lossyScale.y + 0.4f))
+        if (Physics.Raycast(transform.position, -transform.up, out groundHit, transform.lossyScale.y + 0.3f))
         {
             onGround = true;
             onWall = false;
@@ -168,7 +208,7 @@ public class mechBehaviour : MonoBehaviour {
 
         //If on the ground, not recovering, and the jump buttons were pressed.
         if (jumpAxes != 0 && onGround && landRecovery <= 0f)
-            RB.AddForce(0f, jumpPower * Time.deltaTime, 0f, ForceMode.Impulse);
+            RB.AddForce(0f, jumpPower * Time.deltaTime, 0f, ForceMode.VelocityChange);
         
         //Wall Jump is in OnTriggerStay
 
@@ -184,10 +224,13 @@ public class mechBehaviour : MonoBehaviour {
         ////Glide & Fast Fall
         if (RB.velocity.y < -0.2f && (vAxesInput != 0 || hAxesInput != 0))
         {
-            RB.AddForce(0f, 10f, 0f);
+            RB.AddForce(0f, 20f, 0f);
         }
         else if (RB.velocity.y < 0f)
-            RB.AddForce(0f, -20f, 0f);
+            RB.AddForce(0f, -25f, 0f);
+
+        //Perpetual Fast Fall
+        RB.AddForce(0f, -20f, 0f);
 
 
         ////Click Boost
@@ -211,9 +254,19 @@ public class mechBehaviour : MonoBehaviour {
         //If player presses fire1 and boost is off cooldown.
         if (fire1Axes != 0 && boostCooldown_Var <= 0 && boostNumber_Var > 0)
         {
-            RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 2f, ForceMode.Impulse);
+			if (onGround)
+				RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed), ForceMode.Impulse);
+			else
+				RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 8f, ForceMode.Impulse);
             boostCooldown_Var = boostCooldown;
             boostNumber_Var--;
+        }
+
+        ////Chaser Attack
+        //If player presses the right mouse button
+        if (fire2Axes != 0)
+        {
+
         }
 
         ////Player Transparency
@@ -223,17 +276,6 @@ public class mechBehaviour : MonoBehaviour {
             transparency += Time.deltaTime * 2;
 
         GetComponent<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, transparency);
-
-        ////Wind FX
-        //Wind that appears below player to help with landing
-        RaycastHit verticalAlignHit;
-        if (Physics.Raycast(transform.position, -transform.up, out verticalAlignHit, 50f))
-            windSystem.transform.position = verticalAlignHit.point;
-
-        //Wind to indicate exceeding regular top speed
-        speedWind.transform.position = transform.position;
-        speedWind.transform.LookAt(RB.velocity+transform.position, transform.up);
-        speedWind.GetComponent<ParticleSystem>().emissionRate = (RB.velocity.magnitude - (topSpeed+5f))*20;
     }
 
     //Handling Wall Collisions and Wall State
@@ -263,7 +305,7 @@ public class mechBehaviour : MonoBehaviour {
         if (inWallRun && onWall && (Mathf.Abs(RB.velocity.x) > 1|| Mathf.Abs(RB.velocity.z) > 1))
         {
             //Slow their fall speed
-            if (RB.velocity.y < -0.2)
+            if (RB.velocity.y < -0.8)
             {
                 RB.AddForce(transform.up * 80);
             }
