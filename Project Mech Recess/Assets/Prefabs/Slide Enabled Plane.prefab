@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Slide Enabled Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &429322
 Transform:
@@ -40,7 +40,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 4edd5a5da7fd1154181c62f2381a40c2, type: 2}
+  - {fileID: 2100000, guid: 293deab2a125e914f910b5d6cb5b97f9, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1

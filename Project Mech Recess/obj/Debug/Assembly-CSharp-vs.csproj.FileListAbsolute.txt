@@ -1,0 +1,14 @@
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\UnityEditor.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\UnityEditor.iOS.Extensions.Xcode.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\UnityEngine.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\Unity.SerializationLogic.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\Temp\bin\Debug\Unity.CecilTools.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\obj\Debug\Assembly-CSharp.dll
+C:\Users\One\Documents\GitHub\Project-Mech-Recess\Project Mech Recess\obj\Debug\Assembly-CSharp.pdb
