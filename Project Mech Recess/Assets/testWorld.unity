@@ -1444,7 +1444,7 @@ Prefab:
       objectReference: {fileID: 1780696790}
     - target: {fileID: 11471368, guid: c319e51bf2b1e2741be1497b315d93b9, type: 2}
       propertyPath: jumpPower
-      value: 60
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 13638188, guid: c319e51bf2b1e2741be1497b315d93b9, type: 2}
       propertyPath: m_Height

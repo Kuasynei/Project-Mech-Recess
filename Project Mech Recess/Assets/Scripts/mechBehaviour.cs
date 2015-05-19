@@ -124,7 +124,8 @@ public class mechBehaviour : MonoBehaviour {
 		            * hAxesInput * wallDampener * wallJumpTurnSpeed * (boostCooldown_Var + 1));
 
         ////Rotate Towards Movement
-        if (Quaternion.LookRotation(new Vector3(RB.velocity.normalized.x, 0, RB.velocity.normalized.z)) != new Quaternion(0,0,0,0))
+        //If 
+        if (new Vector3(RB.velocity.normalized.x, 0, RB.velocity.normalized.z) != new Vector3(0,0,0))
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(new Vector3(RB.velocity.normalized.x, 0, RB.velocity.normalized.z)), 
                                                             Mathf.Clamp(RB.velocity.magnitude, 3f, 20f));
