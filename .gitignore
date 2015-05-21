@@ -2,9 +2,9 @@
 Thumbs.db
 
 # Unity
-*/.userprefs
-*/.unityproj
-*/.csproj
-*/.sln
+/*.userprefs
+/*.unityproj
+/*.csproj
+/*.sln
 /Library/
 /Temp/
