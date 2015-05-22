@@ -17,7 +17,11 @@ public class gateScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
     {
+<<<<<<< HEAD
         //Debug.Log("Time since exit: " + timeSince);
+=======
+        Debug.Log("Time since exit: " + timeSince);
+>>>>>>> origin/Wall-Stick-Fix-&-Wall-States
         if (GetComponent<Collider>().isTrigger == false)
         {
             timeSince -= Time.deltaTime;
@@ -27,9 +31,12 @@ public class gateScript : MonoBehaviour {
                 GetComponent<Collider>().isTrigger = true;
 
                 timeSince = 0.0f;
+<<<<<<< HEAD
 
                 GetComponentInChildren<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, 0.5f);
                 
+=======
+>>>>>>> origin/Wall-Stick-Fix-&-Wall-States
             }
         }
 	}
@@ -51,8 +58,11 @@ public class gateScript : MonoBehaviour {
             GetComponent<Collider>().isTrigger = false;
 
             timeSince = beginTime;
+<<<<<<< HEAD
 
             GetComponentInChildren<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, 0f);
+=======
+>>>>>>> origin/Wall-Stick-Fix-&-Wall-States
         }
     }
 }
