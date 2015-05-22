@@ -87,8 +87,8 @@ public class customOrbitCameraScript : MonoBehaviour {
                 {
                     nearest = pivotRayHits[i].distance;
                     Debug.DrawLine(pivotTransform.position, new Vector3(pivotRayHits[i].point.x, pivotRayHits[i].point.y + 0.4f, pivotRayHits[i].point.z) - (pivotRay.direction), Color.cyan);
-                    pivotTransform.position = Vector3.Slerp(pivotTransform.position, new Vector3(pivotRayHits[i].point.x, pivotRayHits[i].point.y + 0.4f, pivotRayHits[i].point.z) - (pivotRay.direction),
-                                                            turnSmoothing * Time.deltaTime);
+                    pivotTransform.position = Vector3.Slerp(pivotTransform.position, new Vector3(pivotRayHits[i].point.x, pivotRayHits[i].point.y + 0.3f, pivotRayHits[i].point.z) - (pivotRay.direction*2f),
+                                                            15f * Time.deltaTime);
                     //Debug.Log("Cinder");
                 }
             }
