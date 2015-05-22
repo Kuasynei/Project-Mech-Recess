@@ -57,11 +57,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 164654}
   m_Enabled: 1
   m_EditorHideFlags: 0
-<<<<<<< HEAD
   m_Script: {fileID: 11500000, guid: 9c21df631772b9145a8e86ec6e5c9c13, type: 3}
-=======
   m_Script: {fileID: 11500000, guid: 947cac8a53b84404b885fa46bc944895, type: 3}
->>>>>>> origin/Wall-Stick-Fix-&-Wall-States
   m_Name: 
   m_EditorClassIdentifier: 
   timeSince: 10
