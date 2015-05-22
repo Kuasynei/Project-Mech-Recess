@@ -1,0 +1,10 @@
+# Windows
+Thumbs.db
+
+# Unity
+*.userprefs
+*.unityproj
+*.csproj
+*.sln
+Library/
+Temp/
