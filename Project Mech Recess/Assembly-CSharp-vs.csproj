@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\FPSDisplay.cs" />
      <Compile Include="Assets\Scripts\customOrbitCameraScript.cs" />
+     <Compile Include="Assets\Scripts\gateScript.cs" />
      <Compile Include="Assets\Scripts\mechBehaviour.cs" />
      <None Include="Assets\Read Me.txt" />
  <Reference Include="UnityEngine.UI">
