@@ -6,5 +6,10 @@ Thumbs.db
 *.unityproj
 *.csproj
 *.sln
+<<<<<<< HEAD:Project Mech Recess/.gitignore
 Library/
 Temp/
+=======
+/Project Mech Recess/Library/
+/Project Mech Recess/Temp/
+>>>>>>> 0c6559f8b5dbaa7147114732a30e9089e0ac2301:.gitignore
