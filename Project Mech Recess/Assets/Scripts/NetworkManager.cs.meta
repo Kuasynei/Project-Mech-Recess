@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4ae082f10ad16684582807e93bf4a981
+timeCreated: 1433336307
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - player: {fileID: 151662, guid: e84651e657a1eb54c9b5e731d2818004, type: 2}
+  - orbitCamera: {fileID: 180734, guid: 045c8d0d2a6c7504dadf27b98dcae1da, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

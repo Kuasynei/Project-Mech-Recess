@@ -1,8 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="C:\Users\tony.doan\Google Drive\Semester 3\Programming Fundamentals 2\Week 7\Lab 7\Assets\playerMovement.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\mechBehaviour.cs">
     <Files>
-      <File FileName="C:\Users\tony.doan\Google Drive\Semester 3\Programming Fundamentals 2\Week 7\Lab 7\Assets\playerMovement.cs" Line="22" Column="1" />
+      <File FileName="Assets\Scripts\NetworkManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\customOrbitCameraScript.cs" Line="83" Column="54" />
+      <File FileName="Assets\Scripts\mechBehaviour.cs" Line="78" Column="46" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

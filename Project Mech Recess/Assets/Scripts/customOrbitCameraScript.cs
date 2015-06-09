@@ -4,6 +4,7 @@ using System.Collections;
 public class customOrbitCameraScript : MonoBehaviour {
     
     public Transform player;
+	public GameObject cameraPrefab;
     public float maxDistance = 6;
     public float cameraSpeed = 10;
     public float turnSpeed = 10f;
@@ -24,7 +25,7 @@ public class customOrbitCameraScript : MonoBehaviour {
 
     private Transform pivotTransform;   //Pivot point tied to camera
     private Transform pivotOffset;      //Pivot point purely for offsetting
-    private Transform cameraTransform;
+	private GameObject instantiatedCamera;
 
     private Ray pivotRay;
     private RaycastHit[] pivotRayHits;
@@ -33,14 +34,11 @@ public class customOrbitCameraScript : MonoBehaviour {
 
     void Start()
     {
+        InstantiateCamera();
+
         ////Set pivotTransform to position of the pivot object when the game starts.
         pivotTransform = transform.FindChild("Pivot").GetComponent<Transform>();
         pivotOffset = transform.FindChild("Pivot Set").GetComponent<Transform>();
-
-        //Get Camera Transform
-        cameraTransform = GetComponentInChildren<Camera>().transform;
-
-        cameraEulers = cameraTransform.rotation.eulerAngles;
     }
 
     void Update()
@@ -64,7 +62,7 @@ public class customOrbitCameraScript : MonoBehaviour {
         cameraTiltAngle = Mathf.Clamp(cameraTiltAngle, -minTilt, maxTilt);
 
         cameraRotation = Quaternion.Euler(cameraTiltAngle, cameraEulers.y, cameraEulers.z);
-        cameraTransform.localRotation = Quaternion.Slerp(cameraTransform.localRotation, cameraRotation, turnSmoothing * Time.deltaTime);
+		instantiatedCamera.transform.localRotation = Quaternion.Slerp(instantiatedCamera.transform.localRotation, cameraRotation, turnSmoothing * Time.deltaTime);
         //Debug.Log("CAMERA Y: " + pivotTransform.position.y + "| PLAYER Y: " + player.transform.position.y + "|X rotation: " + (cameraRotation.x + 0.1f) * 2);
         
         ////ray for pivot object to prevent clipping.
@@ -83,7 +81,7 @@ public class customOrbitCameraScript : MonoBehaviour {
         {
             if (pivotRayHits[i].distance < nearest)
             {
-                if (pivotRayHits[i].collider.tag != player.gameObject.tag) //If closest collision point and not the player, move pivot there.
+                if (!pivotRayHits[i].collider.isTrigger && pivotRayHits[i].collider.tag != player.gameObject.tag) //If closest collision point and not the player, move pivot there.
                 {
 
                     nearest = pivotRayHits[i].distance;
@@ -101,6 +99,29 @@ public class customOrbitCameraScript : MonoBehaviour {
         {
             //Debug.Log("Magma");
             pivotTransform.position = Vector3.Slerp(pivotTransform.position, transform.position + pivotRay.direction*maxDistance, turnSmoothing * Time.deltaTime);
+        }
+    }
+
+	void InstantiateCamera()
+	{
+		Transform pivotTemp = transform.FindChild ("Pivot");
+		instantiatedCamera = GameObject.Instantiate (cameraPrefab, pivotTemp.position, pivotTemp.rotation) as GameObject;
+		instantiatedCamera.transform.parent = pivotTemp.transform;
+
+		//Set Eulers
+		cameraEulers = instantiatedCamera.transform.rotation.eulerAngles;
+	}
+
+	public GameObject getMainCamera()
+	{
+		return instantiatedCamera.gameObject;
+	}
+
+    public void EnableCameraIfOwner()
+    {
+        if (GetComponent<NetworkView>().isMine)
+        {
+            instantiatedCamera.GetComponentInChildren<Camera>().enabled = true;
         }
     }
 }

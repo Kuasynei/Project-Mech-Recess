@@ -15,6 +15,9 @@ public class mechBehaviour : MonoBehaviour {
 
     public float reticleMaxDistance = 100f; 	//If the reticle doesn't hit any colliders.
 
+    public bool controlsEnabled = true;
+    public bool isChaser = false;
+
     //Private Stat Variables
     private float boostCooldown_Var = 0f;	 	//Player's current time available before boost is available.
     private int boostNumber_Var = 0;		 	//Player's current available boosts.
@@ -25,7 +28,6 @@ public class mechBehaviour : MonoBehaviour {
 	private bool inWallRun = false;
 	private float wallJumpTurnSpeed = 1f;		//Prevent player from jumping back onto a wall infinitely to climb it.
 	
-	private bool isChaser = true;
     private float isAttacking = 0f;
 
     //Input Variables
@@ -44,46 +46,73 @@ public class mechBehaviour : MonoBehaviour {
     public GameObject empSphereParticles;
     public GameObject empBlastParticles;
 
+    public GameObject playerModel;
+    public GameObject attackHurtbox;
+    public Material chaserMaterial;
+    public Material runnerMaterial;
+
     //Private Components
 	private Rigidbody RB;
     private GameObject speedWind;
 
 	void Awake () {
 		RB = GetComponent<Rigidbody>();
-
 	}
 	
 	void Start () {
         reticleObj = Instantiate(reticleObj, transform.position, Quaternion.identity) as GameObject;
 
         speedWind = Instantiate(windParticles, transform.position, Quaternion.identity) as GameObject;
+		speedWind.transform.parent = transform;
+
         windParticles = Instantiate(windParticles, transform.position, Quaternion.identity) as GameObject;
         windParticles.transform.rotation = Quaternion.Euler(-90, 0, 0);
+		windParticles.transform.parent = transform;
 
         empSphereParticles = Instantiate(empSphereParticles, transform.position, Quaternion.identity) as GameObject;
         empSphereParticles.GetComponent<ParticleSystem>().Stop();
+		empSphereParticles.transform.parent = transform;
 
         empBlastParticles = Instantiate(empBlastParticles, transform.position, Quaternion.identity) as GameObject;
         empBlastParticles.GetComponent<ParticleSystem>().Stop();
-            
+		empBlastParticles.transform.parent = transform;
+
+        attackHurtbox = Instantiate(attackHurtbox, transform.position, Quaternion.Euler(90, 0, 0)) as GameObject;
+		attackHurtbox.transform.parent = transform;
+		attackHurtbox.GetComponent<CapsuleCollider> ().enabled = false;
+
+		//Changing parent of the player model
+		playerModel = Instantiate (playerModel, transform.position-transform.up*1.7f, transform.rotation) as GameObject;
+		playerModel.transform.parent = transform;
+
+        
 	}
 
     void Update()
     {
+        ////Cursor Relock
+        if (Cursor.lockState != CursorLockMode.Locked && fire1Axes != 0)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
         ////Input
-		hAxesInput = Input.GetAxis("Horizontal");
-		vAxesInput = Input.GetAxis("Vertical");
-		jumpAxes = Input.GetAxis("Jump");
-		fire1Axes = Input.GetAxis("Fire1");
-		fire2Axes = Input.GetAxis("Fire2");
-		shiftTechInput = Input.GetKey(KeyCode.LeftShift);
-		
-		////Cursor Relock
-		if (Cursor.lockState != CursorLockMode.Locked && fire1Axes != 0)
-		{
-			Cursor.lockState = CursorLockMode.Locked;
-			Cursor.visible = false;
-		}
+        if (controlsEnabled)
+        {
+            hAxesInput = Input.GetAxis("Horizontal");
+            vAxesInput = Input.GetAxis("Vertical");
+            jumpAxes = Input.GetAxis("Jump");
+            fire1Axes = Input.GetAxis("Fire1");
+            fire2Axes = Input.GetAxis("Fire2");
+            shiftTechInput = Input.GetKey(KeyCode.LeftShift);
+        }
 		
 		////Wall Slide
 		//Limiting horizontal movement when in a wall slide.
@@ -179,9 +208,10 @@ public class mechBehaviour : MonoBehaviour {
 			reticleObj.transform.position = defaultPoint;
 
         ////Chaser Attack
-        //If player presses the right mouse button. 
-        if (fire2Axes != 0 && isChaser && isAttacking <= 0)
+        //If player presses the right mouse button, trigger attack.
+        if (fire2Axes != 0 && isChaser && isAttacking <= 0 && isChaser)
         {
+            attackHurtbox.GetComponent<CapsuleCollider>().enabled = true;
             empSphereParticles.GetComponent<ParticleSystem>().Play();
             empBlastParticles.GetComponent<ParticleSystem>().Play();
             if (RB.drag != 15)
@@ -189,7 +219,7 @@ public class mechBehaviour : MonoBehaviour {
             isAttacking = 2f;
         }
 
-        //Perform the attack (Execution)
+        //True while attacking
         if (isAttacking > 0)
         {
             if (isAttacking > 0.5f)
@@ -204,6 +234,9 @@ public class mechBehaviour : MonoBehaviour {
 
                 if (RB.drag != 0)
                     RB.drag = 0;
+
+                if (attackHurtbox.GetComponent<CapsuleCollider>().enabled)
+                    attackHurtbox.GetComponent <CapsuleCollider>().enabled = false;
             }
 
             isAttacking -= Time.deltaTime;
@@ -212,7 +245,7 @@ public class mechBehaviour : MonoBehaviour {
 		////Jumps
 		//Ground Detection
 		RaycastHit groundHit;
-		if (Physics.Raycast(transform.position, -transform.up, out groundHit, transform.lossyScale.y * 1.05f))
+		if (Physics.Raycast(transform.position, -transform.up, out groundHit, transform.lossyScale.y * 1.09f))
 		{
 			onGround = true;
 			onWall = false;
@@ -300,23 +333,34 @@ public class mechBehaviour : MonoBehaviour {
             windParticles.GetComponent<ParticleSystem>().Stop();
 
         //Wind to indicate exceeding regular top speed
-        speedWind.transform.position = transform.position;
         speedWind.transform.LookAt(RB.velocity + transform.position, transform.up);
         speedWind.GetComponent<ParticleSystem>().emissionRate = (RB.velocity.magnitude * 0.7f - (topSpeed + 5f)) * 20;
 
         //EMP attack particles
-        empSphereParticles.transform.position = transform.position;
-        empBlastParticles.transform.position = transform.position;
         {
             Vector3 rot = transform.rotation.eulerAngles;
             rot = new Vector3(rot.x, rot.y + 180, rot.z);
             empBlastParticles.transform.rotation = Quaternion.Euler(rot);
         }
+
+        
     }
 
     //Handling Wall Collisions and Wall State
     void OnTriggerStay(Collider other)
     {
+        if (isAttacking > 0.5 && isChaser)
+        {
+            if (other.transform.CompareTag("Player"))
+            {
+                other.SendMessage("Tagged", SendMessageOptions.DontRequireReceiver);
+                playerModel.GetComponentInChildren<Renderer>().material = runnerMaterial;
+                isChaser = false;
+            }
+            return;
+        }
+
+
         //If player is touching wall and not on the ground.
         if (onWall == false && other.tag == "Slide Enabled Wall" && !onGround)
         {
@@ -362,8 +406,47 @@ public class mechBehaviour : MonoBehaviour {
         {
             onWall = false;
             inWallRun = false;
+        }     
+    }
+
+    void OnCollisionEnter(Collision coll)
+    {
+        //Allows the chaser to manually collide with runners.
+        if (coll.transform.CompareTag("Player") && isChaser)
+        {
+            coll.transform.SendMessage("Tagged", SendMessageOptions.DontRequireReceiver);
+            playerModel.GetComponentInChildren<Renderer>().material = runnerMaterial;
+            isChaser = false;
         }
-            
+    }
+
+    void Tagged()
+    {
+        if (!isChaser)
+        {
+            playerModel.GetComponentInChildren<Renderer>().material = chaserMaterial;
+            StartCoroutine(TransitionToChaser());
+        }
+    }
+
+    public void EnableControlsIfOwner()
+    {
+        if (GetComponent<NetworkView>().isMine)
+        {
+            controlsEnabled = true;
+        }
+    }
+
+    IEnumerator TransitionToChaser()
+    {
+        controlsEnabled = false;
+        hAxesInput = vAxesInput = jumpAxes = fire1Axes = fire2Axes = 0;
+        shiftTechInput = false;
+
+        yield return new WaitForSeconds(3);
+
+        controlsEnabled = true;
+        isChaser = true;
     }
 
 }
