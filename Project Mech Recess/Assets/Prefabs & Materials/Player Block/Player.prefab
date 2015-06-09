@@ -1,33 +1,16 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &110874
-GameObject:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 417082}
-  - 33: {fileID: 3366228}
-  - 23: {fileID: 2308576}
-  m_Layer: 0
-  m_Name: Box005
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &123782
+--- !u!1 &119956
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 449764}
-  - 95: {fileID: 9506984}
+  - 4: {fileID: 435684}
+  - 95: {fileID: 9502582}
   m_Layer: 0
-  m_Name: T.A.G. Armor model2 TEST 1
+  m_Name: Stratos unwrap2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53,11 +36,44 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &417082
+--- !u!1 &134798
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 468166}
+  - 33: {fileID: 3353720}
+  - 23: {fileID: 2367038}
+  m_Layer: 0
+  m_Name: Box005
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &190286
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 469562}
+  m_Layer: 0
+  m_Name: Particle View 001
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &435684
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
+<<<<<<< HEAD
 <<<<<<< HEAD:Project Mech Recess/Assets/Prefabs/Player Block/Player.prefab
   m_GameObject: {fileID: 133364}
   m_LocalRotation: {x: 1.54543134e-08, y: .707106769, z: -1.54543098e-08, w: .707106888}
@@ -67,10 +83,23 @@ Transform:
   m_Father: {fileID: 432728}
   m_RootOrder: 2
 --- !u!4 &417250
+=======
+  m_GameObject: {fileID: 119956}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -.961111188, z: 0}
+  m_LocalScale: {x: .550000012, y: .550000012, z: .550000012}
+  m_Children:
+  - {fileID: 468166}
+  - {fileID: 469562}
+  m_Father: {fileID: 490186}
+  m_RootOrder: 0
+--- !u!4 &468166
+>>>>>>> 335aae532b50efa08d0f9e6b023411fe7e87222b
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
+<<<<<<< HEAD
   m_GameObject: {fileID: 176720}
   m_LocalRotation: {x: 1.79124143e-07, y: -.707106769, z: 1.79124115e-07, w: .707106888}
 =======
@@ -79,17 +108,24 @@ Transform:
 >>>>>>> 0c6559f8b5dbaa7147114732a30e9089e0ac2301:Project Mech Recess/Assets/Prefabs & Materials/Player Block/Player.prefab
   m_LocalPosition: {x: .0681166351, y: 1.31545579, z: .112136059}
   m_LocalScale: {x: 1, y: 1, z: 1}
+=======
+  m_GameObject: {fileID: 134798}
+  m_LocalRotation: {x: 9.41569667e-08, y: -.707106709, z: 9.41569596e-08, w: .707106829}
+  m_LocalPosition: {x: -.043955069, y: 1.80691719, z: -.146912351}
+  m_LocalScale: {x: .0151378, y: .018546436, z: .0180441774}
+>>>>>>> 335aae532b50efa08d0f9e6b023411fe7e87222b
   m_Children: []
-  m_Father: {fileID: 449764}
+  m_Father: {fileID: 435684}
   m_RootOrder: 0
---- !u!4 &449764
+--- !u!4 &469562
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 123782}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_GameObject: {fileID: 190286}
+  m_LocalRotation: {x: -.707106829, y: 0, z: -0, w: .707106829}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
   m_LocalScale: {x: .600000024, y: .600000024, z: .600000024}
   m_Children:
   - {fileID: 417082}
@@ -134,6 +170,12 @@ Transform:
   m_RootOrder: 1
 =======
 >>>>>>> 0c6559f8b5dbaa7147114732a30e9089e0ac2301:Project Mech Recess/Assets/Prefabs & Materials/Player Block/Player.prefab
+=======
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 435684}
+  m_RootOrder: 1
+>>>>>>> 335aae532b50efa08d0f9e6b023411fe7e87222b
 --- !u!4 &490186
 Transform:
   m_ObjectHideFlags: 1
@@ -144,7 +186,7 @@ Transform:
   m_LocalPosition: {x: -6, y: 0, z: 0}
   m_LocalScale: {x: 1.79999995, y: 1.79999995, z: 1.79999995}
   m_Children:
-  - {fileID: 449764}
+  - {fileID: 435684}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!23 &2306910
@@ -171,17 +213,17 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!23 &2308576
+--- !u!23 &2367038
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 110874}
+  m_GameObject: {fileID: 134798}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: aa8848d2eb95cbc4890f8e64f508f732, type: 2}
+  - {fileID: 2100000, guid: 7297d1b82d5f963458153ae0071505e2, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -195,13 +237,13 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!33 &3366228
+--- !u!33 &3353720
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 110874}
-  m_Mesh: {fileID: 4300000, guid: 436168f83d0845f45ba8ef599a575c0d, type: 3}
+  m_GameObject: {fileID: 134798}
+  m_Mesh: {fileID: 4300000, guid: 9a7c3995097ae67458cf4627960e00bb, type: 3}
 --- !u!54 &5427754
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -217,15 +259,15 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!95 &9506984
+--- !u!95 &9502582
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 123782}
+  m_GameObject: {fileID: 119956}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 436168f83d0845f45ba8ef599a575c0d, type: 3}
+  m_Avatar: {fileID: 9000000, guid: 9a7c3995097ae67458cf4627960e00bb, type: 3}
   m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -260,7 +302,9 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   reticleObj: {fileID: 117034, guid: 55dc516ea4afec140bc0f23aea11b27d, type: 2}
   boostLight: {fileID: 134106, guid: f0a193ef916fffd489c6b324a62d1785, type: 2}
-  windSystem: {fileID: 158188, guid: b143ce65b124ead4ab60090f034d97ff, type: 2}
+  windParticles: {fileID: 158188, guid: b143ce65b124ead4ab60090f034d97ff, type: 2}
+  empSphereParticles: {fileID: 131228, guid: c52470db36cdb464ebdf2a169740c04a, type: 2}
+  empBlastParticles: {fileID: 112098, guid: 976287dcb44f4ff4a88bb1a3c51bcc69, type: 2}
 --- !u!135 &13566722
 SphereCollider:
   m_ObjectHideFlags: 1

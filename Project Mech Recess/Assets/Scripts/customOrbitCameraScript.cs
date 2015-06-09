@@ -81,16 +81,18 @@ public class customOrbitCameraScript : MonoBehaviour {
         
         for (int i = 0; i < pivotRayHits.Length; i++)
         {
-            if (pivotRayHits[i].collider.tag != player.gameObject.tag) //If closest collision point and not the player, move pivot there.
+            if (pivotRayHits[i].distance < nearest)
             {
-                if (pivotRayHits[i].distance < nearest)
+                if (pivotRayHits[i].collider.tag != player.gameObject.tag) //If closest collision point and not the player, move pivot there.
                 {
+
                     nearest = pivotRayHits[i].distance;
                     Debug.DrawLine(pivotTransform.position, new Vector3(pivotRayHits[i].point.x, pivotRayHits[i].point.y + 0.4f, pivotRayHits[i].point.z) - (pivotRay.direction), Color.cyan);
                     pivotTransform.position = Vector3.Slerp(pivotTransform.position, new Vector3(pivotRayHits[i].point.x, pivotRayHits[i].point.y + 0.3f, pivotRayHits[i].point.z) + (pivotRayHits[i].normal),
                                                             15f * Time.deltaTime);
                     //Debug.Log("Cinder");
-                }
+
+                } 
             }
         }
 
