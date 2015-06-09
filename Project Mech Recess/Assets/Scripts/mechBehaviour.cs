@@ -15,6 +15,9 @@ public class mechBehaviour : MonoBehaviour {
 
     public float reticleMaxDistance = 100f; 	//If the reticle doesn't hit any colliders.
 
+    public bool controlsEnabled = true;
+    public bool isChaser = false;
+
     //Private Stat Variables
     private float boostCooldown_Var = 0f;	 	//Player's current time available before boost is available.
     private int boostNumber_Var = 0;		 	//Player's current available boosts.
@@ -25,10 +28,7 @@ public class mechBehaviour : MonoBehaviour {
 	private bool inWallRun = false;
 	private float wallJumpTurnSpeed = 1f;		//Prevent player from jumping back onto a wall infinitely to climb it.
 	
-	private bool isChaser = false;
-    private bool isAttacking = false;
-
-	private float transparency = 1;				//To allow transparency fading for the player.
+    private float isAttacking = 0f;
 
     //Input Variables
 	private float hAxesInput;
@@ -42,7 +42,14 @@ public class mechBehaviour : MonoBehaviour {
     public GameObject mainCamera;
     public GameObject reticleObj;
     public GameObject boostLight;
-    public GameObject windSystem;
+    public GameObject windParticles;
+    public GameObject empSphereParticles;
+    public GameObject empBlastParticles;
+
+    public GameObject playerModel;
+    public GameObject attackHurtbox;
+    public Material chaserMaterial;
+    public Material runnerMaterial;
 
     //Private Components
 	private Rigidbody RB;
@@ -50,32 +57,62 @@ public class mechBehaviour : MonoBehaviour {
 
 	void Awake () {
 		RB = GetComponent<Rigidbody>();
-
 	}
 	
 	void Start () {
         reticleObj = Instantiate(reticleObj, transform.position, Quaternion.identity) as GameObject;
-        speedWind = Instantiate(windSystem, transform.position, Quaternion.identity) as GameObject;
-        windSystem = Instantiate(windSystem, transform.position, Quaternion.identity) as GameObject;
-        windSystem.transform.rotation = Quaternion.Euler(-90, 0, 0);
+
+        speedWind = Instantiate(windParticles, transform.position, Quaternion.identity) as GameObject;
+		speedWind.transform.parent = transform;
+
+        windParticles = Instantiate(windParticles, transform.position, Quaternion.identity) as GameObject;
+        windParticles.transform.rotation = Quaternion.Euler(-90, 0, 0);
+		windParticles.transform.parent = transform;
+
+        empSphereParticles = Instantiate(empSphereParticles, transform.position, Quaternion.identity) as GameObject;
+        empSphereParticles.GetComponent<ParticleSystem>().Stop();
+		empSphereParticles.transform.parent = transform;
+
+        empBlastParticles = Instantiate(empBlastParticles, transform.position, Quaternion.identity) as GameObject;
+        empBlastParticles.GetComponent<ParticleSystem>().Stop();
+		empBlastParticles.transform.parent = transform;
+
+        attackHurtbox = Instantiate(attackHurtbox, transform.position, Quaternion.Euler(90, 0, 0)) as GameObject;
+		attackHurtbox.transform.parent = transform;
+		attackHurtbox.GetComponent<CapsuleCollider> ().enabled = false;
+
+		//Changing parent of the player model
+		playerModel = Instantiate (playerModel, transform.position-transform.up*1.7f, transform.rotation) as GameObject;
+		playerModel.transform.parent = transform;
+
+        
 	}
 
     void Update()
     {
+        ////Cursor Relock
+        if (Cursor.lockState != CursorLockMode.Locked && fire1Axes != 0)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
         ////Input
-		hAxesInput = Input.GetAxis("Horizontal");
-		vAxesInput = Input.GetAxis("Vertical");
-		jumpAxes = Input.GetAxis("Jump");
-		fire1Axes = Input.GetAxis("Fire1");
-		fire2Axes = Input.GetAxis("Fire2");
-		shiftTechInput = Input.GetKey(KeyCode.LeftShift);
-		
-		////Cursor Relock
-		if (Cursor.lockState != CursorLockMode.Locked && fire1Axes != 0)
-		{
-			Cursor.lockState = CursorLockMode.Locked;
-			Cursor.visible = false;
-		}
+        if (controlsEnabled)
+        {
+            hAxesInput = Input.GetAxis("Horizontal");
+            vAxesInput = Input.GetAxis("Vertical");
+            jumpAxes = Input.GetAxis("Jump");
+            fire1Axes = Input.GetAxis("Fire1");
+            fire2Axes = Input.GetAxis("Fire2");
+            shiftTechInput = Input.GetKey(KeyCode.LeftShift);
+        }
 		
 		////Wall Slide
 		//Limiting horizontal movement when in a wall slide.
@@ -169,11 +206,46 @@ public class mechBehaviour : MonoBehaviour {
 		}
 		else
 			reticleObj.transform.position = defaultPoint;
-		
+
+        ////Chaser Attack
+        //If player presses the right mouse button, trigger attack.
+        if (fire2Axes != 0 && isChaser && isAttacking <= 0 && isChaser)
+        {
+            attackHurtbox.GetComponent<CapsuleCollider>().enabled = true;
+            empSphereParticles.GetComponent<ParticleSystem>().Play();
+            empBlastParticles.GetComponent<ParticleSystem>().Play();
+            if (RB.drag != 15)
+                RB.drag = 15;
+            isAttacking = 2f;
+        }
+
+        //True while attacking
+        if (isAttacking > 0)
+        {
+            if (isAttacking > 0.5f)
+                jumpAxes = 0;
+            else
+            {
+                if (empSphereParticles.GetComponent<ParticleSystem>().isPlaying)
+                    empSphereParticles.GetComponent<ParticleSystem>().Stop();
+
+                if (empBlastParticles.GetComponent<ParticleSystem>().isPlaying)
+                    empBlastParticles.GetComponent<ParticleSystem>().Stop();
+
+                if (RB.drag != 0)
+                    RB.drag = 0;
+
+                if (attackHurtbox.GetComponent<CapsuleCollider>().enabled)
+                    attackHurtbox.GetComponent <CapsuleCollider>().enabled = false;
+            }
+
+            isAttacking -= Time.deltaTime;
+        }
+
 		////Jumps
 		//Ground Detection
 		RaycastHit groundHit;
-		if (Physics.Raycast(transform.position, -transform.up, out groundHit, transform.lossyScale.y + 0.3f))
+		if (Physics.Raycast(transform.position, -transform.up, out groundHit, transform.lossyScale.y * 1.09f))
 		{
 			onGround = true;
 			onWall = false;
@@ -182,10 +254,12 @@ public class mechBehaviour : MonoBehaviour {
 		}
 		else
 			onGround = false;
-		
+
+        Debug.DrawRay(transform.position, -transform.up * transform.lossyScale.y * 1.05f);
+
 		//If on the ground, not recovering, and the jump buttons were pressed.
 		if (jumpAxes != 0 && onGround && landRecovery <= 0f)
-			RB.AddForce(0f, jumpPower * Time.deltaTime, 0f, ForceMode.VelocityChange);
+            RB.AddForce(0f, jumpPower * Time.deltaTime, 0f, ForceMode.VelocityChange);
 		
 		//Wall Jump is in OnTriggerStay
 		
@@ -201,10 +275,10 @@ public class mechBehaviour : MonoBehaviour {
 		////Glide & Fast Fall
 		if (RB.velocity.y < -0.2f && (vAxesInput != 0 || hAxesInput != 0))
 		{
-			RB.AddForce(0f, 20f, 0f);
+			RB.AddForce(0f, 25f, 0f);
 		}
 		else if (RB.velocity.y < 0f)
-			RB.AddForce(0f, -25f, 0f);
+			RB.AddForce(0f, -30f, 0f);
 		
 		//Perpetual Fast Fall
 		RB.AddForce(0f, -20f, 0f);
@@ -236,52 +310,57 @@ public class mechBehaviour : MonoBehaviour {
 			if (onGround)
 				RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed), ForceMode.Impulse);
 			else
-				RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 8f, ForceMode.Impulse);
+				RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 7f, ForceMode.Impulse);
 			boostCooldown_Var = boostCooldown;
 			boostNumber_Var--;
-		}
-		
-		////Chaser Attack
-		//If player presses the right mouse button
-		if (fire2Axes != 0)
-		{
-			
 		}
     }
 
     void FixedUpdate()
     {
-		////Wind FX
-		//Wind that appears below player to help with landing
-		RaycastHit verticalAlignHit;
-		if (Physics.Raycast(transform.position, -transform.up, out verticalAlignHit, 30f))
-		{
-			windSystem.transform.position = verticalAlignHit.point;
-			if (!windSystem.GetComponent<ParticleSystem>().isPlaying)
-			{
-				windSystem.GetComponent<ParticleSystem>().Play();
-			}
-		}
-		else
-			windSystem.GetComponent<ParticleSystem>().Stop();
-		
-		//Wind to indicate exceeding regular top speed
-		speedWind.transform.position = transform.position;
-		speedWind.transform.LookAt(RB.velocity + transform.position, transform.up);
-		speedWind.GetComponent<ParticleSystem>().emissionRate = (RB.velocity.magnitude - (topSpeed + 5f)) * 20;
+        ////Wind FX
+        //Wind that appears below player to help with landing
+        RaycastHit verticalAlignHit;
+        if (Physics.Raycast(transform.position, -transform.up, out verticalAlignHit, 30f))
+        {
+            windParticles.transform.position = verticalAlignHit.point;
+            if (!windParticles.GetComponent<ParticleSystem>().isPlaying)
+            {
+                windParticles.GetComponent<ParticleSystem>().Play();
+            }
+        }
+        else
+            windParticles.GetComponent<ParticleSystem>().Stop();
 
-		////Player Transparency
-		if (Vector3.Distance(transform.position, mainCamera.transform.position) <= 3f && transparency > 0)
-			transparency -= Time.fixedDeltaTime * 2;
-		else if (transparency < 1)
-            transparency += Time.fixedDeltaTime * 2;
-		
-		GetComponent<MeshRenderer>().material.color = new Vector4(1f, 1f, 1f, transparency);
+        //Wind to indicate exceeding regular top speed
+        speedWind.transform.LookAt(RB.velocity + transform.position, transform.up);
+        speedWind.GetComponent<ParticleSystem>().emissionRate = (RB.velocity.magnitude * 0.7f - (topSpeed + 5f)) * 20;
+
+        //EMP attack particles
+        {
+            Vector3 rot = transform.rotation.eulerAngles;
+            rot = new Vector3(rot.x, rot.y + 180, rot.z);
+            empBlastParticles.transform.rotation = Quaternion.Euler(rot);
+        }
+
+        
     }
 
     //Handling Wall Collisions and Wall State
     void OnTriggerStay(Collider other)
     {
+        if (isAttacking > 0.5 && isChaser)
+        {
+            if (other.transform.CompareTag("Player"))
+            {
+                other.SendMessage("Tagged", SendMessageOptions.DontRequireReceiver);
+                playerModel.GetComponentInChildren<Renderer>().material = runnerMaterial;
+                isChaser = false;
+            }
+            return;
+        }
+
+
         //If player is touching wall and not on the ground.
         if (onWall == false && other.tag == "Slide Enabled Wall" && !onGround)
         {
@@ -327,8 +406,47 @@ public class mechBehaviour : MonoBehaviour {
         {
             onWall = false;
             inWallRun = false;
+        }     
+    }
+
+    void OnCollisionEnter(Collision coll)
+    {
+        //Allows the chaser to manually collide with runners.
+        if (coll.transform.CompareTag("Player") && isChaser)
+        {
+            coll.transform.SendMessage("Tagged", SendMessageOptions.DontRequireReceiver);
+            playerModel.GetComponentInChildren<Renderer>().material = runnerMaterial;
+            isChaser = false;
         }
-            
+    }
+
+    void Tagged()
+    {
+        if (!isChaser)
+        {
+            playerModel.GetComponentInChildren<Renderer>().material = chaserMaterial;
+            StartCoroutine(TransitionToChaser());
+        }
+    }
+
+    public void EnableControlsIfOwner()
+    {
+        if (GetComponent<NetworkView>().isMine)
+        {
+            controlsEnabled = true;
+        }
+    }
+
+    IEnumerator TransitionToChaser()
+    {
+        controlsEnabled = false;
+        hAxesInput = vAxesInput = jumpAxes = fire1Axes = fire2Axes = 0;
+        shiftTechInput = false;
+
+        yield return new WaitForSeconds(3);
+
+        controlsEnabled = true;
+        isChaser = true;
     }
 
 }
