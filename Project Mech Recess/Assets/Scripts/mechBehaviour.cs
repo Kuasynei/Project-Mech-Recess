@@ -16,6 +16,7 @@ public class mechBehaviour : MonoBehaviour {
     public float reticleMaxDistance = 100f; 	//If the reticle doesn't hit any colliders.
 
     public bool controlsEnabled = true;
+    public bool canBoost = true;
     public bool isChaser = false;
 
     //Private Stat Variables
@@ -305,15 +306,18 @@ public class mechBehaviour : MonoBehaviour {
         Debug.DrawRay(transform.position, cameraRay.direction * 5f, Color.white);
 
 		//If player presses fire1 and boost is off cooldown.
-		if (fire1Axes != 0 && boostCooldown_Var <= 0 && boostNumber_Var > 0)
-		{
-			if (onGround)
-				RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed), ForceMode.Impulse);
-			else
-				RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 7f, ForceMode.Impulse);
-			boostCooldown_Var = boostCooldown;
-			boostNumber_Var--;
-		}
+        if (canBoost)
+        {
+            if (fire1Axes != 0 && boostCooldown_Var <= 0 && boostNumber_Var > 0)
+            {
+                if (onGround)
+                    RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed), ForceMode.Impulse);
+                else
+                    RB.AddForce(cameraRay.direction * boostPower * (wallJumpTurnSpeed) + transform.up * 7f, ForceMode.Impulse);
+                boostCooldown_Var = boostCooldown;
+                boostNumber_Var--;
+            }
+        }
     }
 
     void FixedUpdate()
